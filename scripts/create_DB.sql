@@ -1,13 +1,24 @@
 ﻿create database alconaft
 use alconaft
 
+--drop table CUSTOMERS
+--drop table PRODUCT_TYPE
+--drop table ORDER_STATUS_CODES
+--drop table INVOICE_STATUS_CODES
+--drop table PRODUCTS
+--drop table ORDERS
+--drop table ORDER_ITEMS
+--drop table INVOICES
+--drop table PAYMENTS
+--drop table SHIPMENT
+
 create table CUSTOMERS 
 (
 	customer_id int identity(1,1) constraint CUSTOMER_PK primary key,
 	first_name nvarchar(50) not null,
 	last_name nvarchar(50) not null,
-	email_address nvarchar(255) not null,
-	login_name nvarchar(50) not null,
+	email_address nvarchar(255) not null unique,
+	login_name nvarchar(50) not null unique,
 	login_password nvarchar(50) not null,
 	phone_number nvarchar(13),
 	address_line_1 nvarchar(50),
@@ -20,7 +31,7 @@ create table PRODUCT_TYPE
 (
 	product_type_id int identity(1,1) constraint PRODUCT_TYPE_PK primary key,
 	product_type_parent_id int constraint PRODUCT_TYPE_PARENT_FK foreign key references PRODUCT_TYPE(product_type_id),
-	product_type_description nvarchar(50),
+	product_type_description nvarchar(50) unique,
 )
 
 create table PRODUCTS
@@ -36,8 +47,10 @@ create table PRODUCTS
 create table ORDER_STATUS_CODES
 (
 	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
-	order_status_code_description nvarchar(50),
+	order_status_code_description nvarchar(50) unique,
 )
+
+insert into ORDER_STATUS_CODES values ('cancelled'),('completed'),('waiting')
 
 create table ORDERS
 (
@@ -48,18 +61,12 @@ create table ORDERS
 	order_details nvarchar(max)
 )
 
-create table ORDER_ITEM_STATUS_CODES
-(
-	order_item_status_code int identity(1,1) constraint ORDER_ITEM_STATUS_CODES_PK primary key,
-	order_item_status_code_description nvarchar(50),
-)
-
 create table ORDER_ITEMS
 (
 	order_item_id int identity(1,1) constraint ORDER_ITEM_PK primary key,
 	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id),
 	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id),
-	order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
+	--order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
 	order_item_quantity int check( order_item_quantity > 0 ),
 -- вопросик с прайсом нужен ли он в этой таблице
 )
@@ -67,13 +74,15 @@ create table ORDER_ITEMS
 create table INVOICE_STATUS_CODES
 (
 	invoice_status_code int identity(1,1) constraint INVOICE_STATUS_CODES_PK primary key,
-	invoice_status_code_description nvarchar(50),
+	invoice_status_code_description nvarchar(50) unique,
 )
+
+insert into INVOICE_STATUS_CODES values ('issued'),('paid')
 
 create table INVOICES
 (
 	invoice_id int identity(1,1) constraint INVOICES_PK primary key,
-	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id),
+	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) unique,
 	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code),
 	invoice_date date not null
 )
@@ -81,7 +90,7 @@ create table INVOICES
 create table PAYMENTS
 (
 	payment_id int identity(1,1) constraint PAYMENTS_PK primary key,
-	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id),
+	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) unique,
 	payment_date date not null,
 	payment_amount money check( payment_amount > 0 ),
 )
@@ -89,8 +98,8 @@ create table PAYMENTS
 create table SHIPMENT
 (
 	shipment_id int identity(1,1) constraint SHIPMENT_PK primary key,
-	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id),
-	oreder_id int constraint SHIPMENT_ORDER_ID_FK references ORDERS(order_id),
+	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) unique,
+	order_id int constraint SHIPMENT_ORDER_ID_FK references ORDERS(order_id) unique,
 	shipment_tracking_number nvarchar(20) not null,
 	shipment_date date,
 )
