@@ -1,30 +1,3 @@
-alter procedure RandomString
-	@length int,
-	@char_pool nvarchar(max),
-	@random_string nvarchar(max) output
-as
-begin
-	declare @pool_length int,
-			@i int
-
-	if @char_pool is null
-	begin
-		set @char_pool = 'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ'
-	end
-
-	set @pool_length = Len(@char_pool)
-	
-	set @random_string = ''
-
-	set @i = 0
-	while (@i < @length) 
-	begin
-	    set @random_string = @random_string + substring(@char_pool, convert(int, rand() * @pool_length) + 1, 1)
-	    set @i = @i + 1
-	end
-end
-go
-
 alter procedure autoinsert_customers
 	@limit int
 as 
