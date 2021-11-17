@@ -1,16 +1,16 @@
 ﻿create database alconaft
 use alconaft
 
---drop table CUSTOMERS
---drop table PRODUCT_TYPE
---drop table ORDER_STATUS_CODES
---drop table INVOICE_STATUS_CODES
---drop table PRODUCTS
---drop table ORDERS
---drop table ORDER_ITEMS
---drop table INVOICES
---drop table PAYMENTS
---drop table SHIPMENT
+drop table SHIPMENT
+drop table INVOICES
+drop table ORDERS
+drop table PRODUCTS
+drop table INVOICE_STATUS_CODES
+drop table ORDER_STATUS_CODES
+drop table PRODUCT_TYPE
+drop table CUSTOMERS
+drop table PAYMENTS
+drop table ORDER_ITEMS
 
 create table CUSTOMERS 
 (
@@ -44,6 +44,11 @@ create table PRODUCTS
 	product_quantity int not null
 )
 
+insert into PRODUCT_TYPE (product_type_description) values ('bear'),('whiskey'),
+('vodka'),('rum'),('wine'),
+('absinthe'),('gin'),('tequila'),('cognac')
+
+
 create table ORDER_STATUS_CODES
 (
 	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
@@ -55,17 +60,17 @@ insert into ORDER_STATUS_CODES values ('cancelled'),('completed'),('waiting')
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
-	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id),
+	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id) not null,
 	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code),
-	order_date_placed date,
+	order_date_placed datetime,
 	order_details nvarchar(max)
 )
 
 create table ORDER_ITEMS
 (
 	order_item_id int identity(1,1) constraint ORDER_ITEM_PK primary key,
-	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id),
-	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id),
+	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id) not null,
+	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) not null,
 	--order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
 	order_item_quantity int check( order_item_quantity > 0 ),
 -- вопросик с прайсом нужен ли он в этой таблице
@@ -84,22 +89,59 @@ create table INVOICES
 	invoice_id int identity(1,1) constraint INVOICES_PK primary key,
 	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) unique,
 	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code),
-	invoice_date date not null
+	invoice_date datetime not null
 )
 
 create table PAYMENTS
 (
 	payment_id int identity(1,1) constraint PAYMENTS_PK primary key,
-	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) unique,
-	payment_date date not null,
-	payment_amount money check( payment_amount > 0 ),
+	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) unique not null,
+	payment_date datetime not null,
+	payment_amount money,
 )
 
 create table SHIPMENT
 (
 	shipment_id int identity(1,1) constraint SHIPMENT_PK primary key,
-	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) unique,
-	order_id int constraint SHIPMENT_ORDER_ID_FK references ORDERS(order_id) unique,
+	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) unique not null,
 	shipment_tracking_number nvarchar(20) not null,
-	shipment_date date,
+	shipment_date datetime not null,
 )
+
+
+go
+create proc add_product_type
+	@description nvarchar(30),
+	@parent_description nvarchar(30),
+	@parent_id int
+as
+begin
+
+	declare @product_parent_id int
+
+	if @parent_id is null
+	begin
+		set @product_parent_id = 
+		(
+			select product_type_id from PRODUCT_TYPE where product_type_description = @parent_description
+		)
+	end
+	else if @parent_description is null
+	begin
+		set @product_parent_id = 
+		(
+			select product_type_id from PRODUCT_TYPE where product_type_id = @parent_id
+		)
+	end
+	else
+	begin
+		set @product_parent_id = null
+	end
+
+	insert into PRODUCT_TYPE (product_type_description, product_type_parent_id) 
+		values 
+		(
+			@description,
+			@product_parent_id
+		)
+end
