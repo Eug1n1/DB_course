@@ -223,7 +223,7 @@ begin
 			@order_item_quantity int,
 			@product_qunatity int,
 			@i int = 0,
-			@limit int = (select ord.order_id from ORDERS as ord where ord.order_id not in (select order_id from ORDER_ITEMS where order_id = ord.order_id)),
+			@limit int = (select count(*) from ORDERS as ord where ord.order_id not in (select order_id from ORDER_ITEMS where order_id = ord.order_id)),
 			@limit_for_order int,
 			@i_for_order int = 0
 

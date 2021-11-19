@@ -1,16 +1,16 @@
 ﻿create database alconaft
 use alconaft
 
+drop table PAYMENTS
 drop table SHIPMENT
 drop table INVOICES
+drop table ORDER_ITEMS
 drop table ORDERS
-drop table PRODUCTS
 drop table INVOICE_STATUS_CODES
 drop table ORDER_STATUS_CODES
+drop table PRODUCTS
 drop table PRODUCT_TYPE
 drop table CUSTOMERS
-drop table PAYMENTS
-drop table ORDER_ITEMS
 
 create table CUSTOMERS 
 (
@@ -30,7 +30,7 @@ create table CUSTOMERS
 create table PRODUCT_TYPE
 (
 	product_type_id int identity(1,1) constraint PRODUCT_TYPE_PK primary key,
-	product_type_parent_id int constraint PRODUCT_TYPE_PARENT_FK foreign key references PRODUCT_TYPE(product_type_id),
+	product_type_parent_id int constraint PRODUCT_TYPE_PARENT_FK foreign key references PRODUCT_TYPE(product_type_id) on delete no action,
 	product_type_description nvarchar(50) unique,
 )
 
@@ -39,7 +39,7 @@ create table PRODUCTS
 	product_id int identity(1,1) constraint PRODUCT_PK primary key,
 	product_name nvarchar(50) not null,
 	product_description nvarchar(max),
-	product_type_id int constraint PRODUCT_TYPE_FK foreign key references PRODUCT_TYPE(product_type_id),
+	product_type_id int constraint PRODUCT_TYPE_FK foreign key references PRODUCT_TYPE(product_type_id) on delete set null,
 	product_price money not null,
 	product_quantity int not null
 )
@@ -60,8 +60,8 @@ insert into ORDER_STATUS_CODES values ('cancelled'),('completed'),('waiting')
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
-	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id) not null,
-	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code),
+	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id) on delete cascade not null,
+	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code) on delete no action not null,
 	order_date_placed datetime,
 	order_details nvarchar(max)
 )
@@ -69,8 +69,8 @@ create table ORDERS
 create table ORDER_ITEMS
 (
 	order_item_id int identity(1,1) constraint ORDER_ITEM_PK primary key,
-	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id) not null,
-	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) not null,
+	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id) on delete cascade not null,
+	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade not null,
 	--order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
 	order_item_quantity int check( order_item_quantity > 0 ),
 -- вопросик с прайсом нужен ли он в этой таблице
@@ -87,15 +87,15 @@ insert into INVOICE_STATUS_CODES values ('issued'),('paid')
 create table INVOICES
 (
 	invoice_id int identity(1,1) constraint INVOICES_PK primary key,
-	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) unique,
-	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code),
+	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade unique not null,
+	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code) on delete no action not null,
 	invoice_date datetime not null
 )
 
 create table PAYMENTS
 (
 	payment_id int identity(1,1) constraint PAYMENTS_PK primary key,
-	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) unique not null,
+	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) on delete no action unique not null,
 	payment_date datetime not null,
 	payment_amount money,
 )
@@ -103,7 +103,7 @@ create table PAYMENTS
 create table SHIPMENT
 (
 	shipment_id int identity(1,1) constraint SHIPMENT_PK primary key,
-	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) unique not null,
+	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) on delete cascade unique not null,
 	shipment_tracking_number nvarchar(20) not null,
 	shipment_date datetime not null,
 )
