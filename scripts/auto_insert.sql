@@ -405,7 +405,6 @@ exec autoinsert_shipment
 exec autoinsert_payment
 
 
-
 select * from CUSTOMERS
 select * from PRODUCTS
 select * from PRODUCT_TYPE

@@ -61,7 +61,7 @@ create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
 	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id) on delete cascade not null,
-	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code) on delete no action not null,
+	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code) on delete set null,
 	order_date_placed datetime,
 	order_details nvarchar(max)
 )
@@ -88,14 +88,14 @@ create table INVOICES
 (
 	invoice_id int identity(1,1) constraint INVOICES_PK primary key,
 	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade unique not null,
-	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code) on delete no action not null,
+	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code) on delete set null,
 	invoice_date datetime not null
 )
 
 create table PAYMENTS
 (
 	payment_id int identity(1,1) constraint PAYMENTS_PK primary key,
-	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) on delete no action unique not null,
+	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) on delete cascade unique not null,
 	payment_date datetime not null,
 	payment_amount money,
 )
