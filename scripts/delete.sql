@@ -1,8 +1,8 @@
-create procedure delete_customer
-	@customer_id int
+create procedure delete_user
+	@user_id int
 as
 begin
-	delete from CUSTOMERS where customer_id = @customer_id
+	delete from USERS where user_id = @user_id
 end
 go
 

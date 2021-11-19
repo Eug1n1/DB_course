@@ -1,4 +1,4 @@
-create procedure insert_customer
+create procedure insert_user
 	@first_name nvarchar(50),
 	@last_name nvarchar(50),
 	@email_address nvarchar(255),
@@ -11,7 +11,7 @@ create procedure insert_customer
 	@county nvarchar(50)
 as
 begin
-	insert into CUSTOMERS(first_name, last_name, email_address, login_name, login_password, 
+	insert into USERS(first_name, last_name, email_address, login_name, login_password, 
 							phone_number, address_line_1, address_line_2, town_city, county)
 	values (@first_name, @last_name, @email_address, @login_name, @login_password, 
 			@phone_number, @address_line_1, @address_line_2, @town_city, @county)
@@ -32,14 +32,14 @@ end
 go
 
 create procedure insert_order
-	@customer_id int,
+	@user_id int,
 	@order_status_code int,
 	@order_date_placed datetime,
 	@order_details nvarchar(max)
 as
 begin
-	insert into ORDERS (customer_id, order_status_code, order_date_placed, order_details)
-	values (@customer_id, @order_status_code, @order_date_placed, @order_details)
+	insert into ORDERS (user_id, order_status_code, order_date_placed, order_details)
+	values (@user_id, @order_status_code, @order_date_placed, @order_details)
 end
 go
 

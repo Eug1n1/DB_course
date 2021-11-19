@@ -12,9 +12,9 @@ drop table PRODUCTS
 drop table PRODUCT_TYPE
 drop table CUSTOMERS
 
-create table CUSTOMERS 
+create table USERS 
 (
-	customer_id int identity(1,1) constraint CUSTOMER_PK primary key,
+	user_id int identity(1,1) constraint CUSTOMER_PK primary key,
 	first_name nvarchar(50) not null,
 	last_name nvarchar(50) not null,
 	email_address nvarchar(255) not null unique,
@@ -60,7 +60,7 @@ insert into ORDER_STATUS_CODES values ('cancelled'),('completed'),('waiting')
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
-	customer_id int constraint CUSTOMER_ID_FK foreign key references CUSTOMERS(customer_id) on delete cascade not null,
+	user_id int constraint CUSTOMER_ID_FK foreign key references USERS(user_id) on delete cascade not null,
 	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code) on delete set null,
 	order_date_placed datetime,
 	order_details nvarchar(max)

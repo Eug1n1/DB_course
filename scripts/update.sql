@@ -1,5 +1,5 @@
-create procedure update_customer
-	@customer_id int,
+create procedure update_user
+	@user_id int,
 	@first_name nvarchar(50),
 	@last_name nvarchar(50),
 	@email_address nvarchar(255),
@@ -12,7 +12,7 @@ create procedure update_customer
 	@county nvarchar(50)
 as
 begin
-	update CUSTOMERS
+	update USERS
 	set 
 		first_name = @first_name, 
 		last_name = @last_name, 
@@ -25,7 +25,7 @@ begin
 		town_city = @town_city, 
 		county = @county
 	where 
-		customer_id = @customer_id
+		user_id = @user_id
 end
 go
 
@@ -52,7 +52,7 @@ go
 
 create procedure update_order
 	@order_id int,
-	@customer_id int,
+	@user_id int,
 	@order_status_code int,
 	@order_date_placed datetime,
 	@order_details nvarchar(max)
@@ -60,7 +60,7 @@ as
 begin
 	update ORDERS
 	set 
-		customer_id = @customer_id,
+		user_id = @user_id,
 		order_status_code = @order_status_code,
 		order_date_placed = @order_date_placed,
 		order_details = @order_details

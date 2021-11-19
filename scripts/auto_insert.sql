@@ -1,4 +1,4 @@
-alter procedure autoinsert_customers
+create procedure autoinsert_users
 	@limit int
 as 
 begin
@@ -34,7 +34,7 @@ begin
 		set @email_address = concat(@login_name, @email_domain)
 		
 
-		insert into CUSTOMERS(first_name, last_name, email_address, login_name, login_password, phone_number) values (@first_name, @last_name, @email_address, @login_name, @login_password, concat('+37529', @phone_number))
+		insert into USERS(first_name, last_name, email_address, login_name, login_password, phone_number) values (@first_name, @last_name, @email_address, @login_name, @login_password, concat('+37529', @phone_number))
 
 		set @i += 1
 		print @i
@@ -84,7 +84,7 @@ alter procedure autoinsert_orders
 as
 begin
 	declare @i int = 0,
-			@customer_id int,
+			@user_id int,
 			@order_status_code int,
 			@order_data_placed date,
 			@order_datails nvarchar(max)
@@ -94,12 +94,12 @@ begin
 
 	exec RandomString 200, 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM:() -1234567890', @order_datails output
 
-	set @customer_id =
+	set @user_id =
 	(
 		select top 1
-			customer_id 
+			user_id 
 		from 
-			CUSTOMERS
+			USERS
 		order by abs(checksum(newid()))
 	)
 
@@ -112,7 +112,7 @@ begin
 		order by abs(checksum(newid()))
 	)
 
-	insert into ORDERS (customer_id, order_status_code, order_details) values (@customer_id, @order_status_code, @order_datails)
+	insert into ORDERS (user_id, order_status_code, order_details) values (@user_id, @order_status_code, @order_datails)
 	
 	print @i
 	set @i = @i + 1
@@ -124,9 +124,9 @@ alter procedure autoinsert_product_type
 	@limit int
 as 
 begin
-	declare @product_type_parent_id int,
-			@product_type_description nvarchar(20),
-			@i int = 0
+	declare @i int = 0,
+			@product_type_parent_id int,
+			@product_type_description nvarchar(20)
 
 	declare product_type_cursor cursor for
 	select * 
@@ -393,7 +393,7 @@ begin
 end
 go
 
-exec autoinsert_customers 100000
+exec autoinsert_users 100000
 exec autoinsert_product_type 100
 exec autoinsert_invoice_status_codes 5
 exec autoinsert_order_status_codes 5
@@ -403,26 +403,3 @@ exec autoinsert_order_items
 exec autoinsert_invoices
 exec autoinsert_shipment
 exec autoinsert_payment
-
-
-select * from CUSTOMERS
-select * from PRODUCTS
-select * from PRODUCT_TYPE
-select * from INVOICE_STATUS_CODES
-select * from ORDER_STATUS_CODES
-select * from ORDERS
-select * from ORDER_ITEMS
-select * from INVOICES
-select * from SHIPMENT
-
-delete from CUSTOMERS
-delete from PRODUCTS
-delete from PRODUCT_TYPE
-delete from PAYMENTS
-
-select 
-	ord.order_id, itm.product_id, (select product_name from PRODUCTS where product_id = itm.product_id) ['product_name']
-from
-	ORDERS as ord join ORDER_ITEMS as itm
-	on ord.order_id = itm.order_id
-order by ord.order_id
