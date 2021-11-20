@@ -1,3 +1,6 @@
+use alconaft
+go
+
 create procedure insert_user
 	@first_name nvarchar(50),
 	@last_name nvarchar(50),

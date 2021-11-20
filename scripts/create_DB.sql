@@ -10,7 +10,7 @@ drop table INVOICE_STATUS_CODES
 drop table ORDER_STATUS_CODES
 drop table PRODUCTS
 drop table PRODUCT_TYPE
-drop table CUSTOMERS
+drop table USERS
 
 create table USERS 
 (

@@ -1,3 +1,6 @@
+use alconaft
+go
+
 create procedure autoinsert_users
 	@limit int
 as 
@@ -43,7 +46,7 @@ end
 
 go
 
-alter proc autoinsert_products
+create proc autoinsert_products
 	@limit int
 as
 begin
@@ -79,7 +82,7 @@ begin
 end
 go
 
-alter procedure autoinsert_orders
+create procedure autoinsert_orders
 	@limit int
 as
 begin
@@ -120,7 +123,7 @@ begin
 end
 go
 
-alter procedure autoinsert_product_type
+create procedure autoinsert_product_type
 	@limit int
 as 
 begin
@@ -177,7 +180,7 @@ begin
 end
 go
 
-alter procedure autoinsert_order_status_codes
+create procedure autoinsert_order_status_codes
 	@limit int
 as
 begin
@@ -196,7 +199,7 @@ begin
 end
 go
 
-alter procedure autoinsert_invoice_status_codes
+create procedure autoinsert_invoice_status_codes
 	@limit int
 as
 begin
@@ -215,7 +218,7 @@ begin
 end
 go
 
-alter procedure autoinsert_order_items
+create procedure autoinsert_order_items
 as
 begin
 	declare @product_id int,
@@ -270,7 +273,7 @@ begin
 end
 go
 
-alter procedure autoinsert_invoices
+create procedure autoinsert_invoices
 as
 begin
 	declare @i int = 0,
@@ -311,7 +314,7 @@ begin
 end
 go
 
-alter procedure autoinsert_shipment
+create procedure autoinsert_shipment
 as
 begin
 	declare @invoice_id int,
@@ -345,7 +348,7 @@ begin
 end
 go
 
-alter procedure autoinsert_payment
+create procedure autoinsert_payment
 as
 begin
 	declare @i int = 0,
@@ -403,3 +406,4 @@ exec autoinsert_order_items
 exec autoinsert_invoices
 exec autoinsert_shipment
 exec autoinsert_payment
+go

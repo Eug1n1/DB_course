@@ -1,3 +1,6 @@
+use alconaft
+go
+
 create procedure delete_user
 	@user_id int
 as
