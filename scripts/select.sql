@@ -107,24 +107,34 @@ create procedure get_product_types_recursive
 	@product_type_id int
 as
 begin
-	with tree (product_type_id, product_type_parent_id, level)
+	with tree (product_type_id, product_type_parent_id, product_type_description)
 	as 
 	(
 		select 
-			product_type_id, product_type_parent_id, 0
+			product_type_id, 
+			product_type_parent_id, 
+			product_type_description
 		from 
 			PRODUCT_TYPE
 		where 
 			product_type_parent_id = @product_type_id
 		union all
 		select 
-			PRODUCT_TYPE.product_type_id, PRODUCT_TYPE.product_type_parent_id, tree.level + 1
+			PRODUCT_TYPE.product_type_id, 
+			PRODUCT_TYPE.product_type_parent_id,
+			PRODUCT_TYPE.product_type_description
 		from 
 			PRODUCT_TYPE inner join tree 
 		on tree.product_type_id = PRODUCT_TYPE.product_type_parent_id
 	)
-	select product_type_id, product_type_parent_id
-	from tree
+	select 
+		product_type_id, 
+		product_type_parent_id, 
+		product_type_description
+	from 
+		tree
+	order by product_type_parent_id
 end
 go
 
+exec get_product_types_recursive 2
