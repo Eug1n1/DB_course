@@ -37,7 +37,7 @@ create table PRODUCT_TYPE
 create table PRODUCTS
 (
 	product_id int identity(1,1) constraint PRODUCT_PK primary key,
-	product_name nvarchar(50) not null,
+	product_name nvarchar(50) not null unique,
 	product_description nvarchar(max),
 	product_type_id int constraint PRODUCT_TYPE_FK foreign key references PRODUCT_TYPE(product_type_id) on delete set null,
 	product_price money not null,
