@@ -2,9 +2,11 @@ use alconaft
 
 -- USERS
 create unique nonclustered index indx_login_name on USERS(login_name);
+create unique nonclustered index indx_email_address on USERS(email_address);
 
 -- PRODUCTS
 create unique nonclustered index indx_product_name on PRODUCTS(product_name);
+create unique nonclustered index indx_product_name_desc on PRODUCTS(product_name desc);
 create nonclustered index indx_product_type on PRODUCTS(product_type_id);
 create nonclustered index indx_product_price on PRODUCTS(product_price);
 create nonclustered index indx_product_price_desc on PRODUCTS(product_price desc);
@@ -16,7 +18,6 @@ create nonclustered index indx_product_type_parent on PRODUCT_TYPE(product_type_
 
 -- ORDERS
 create nonclustered index indx_user_id on ORDERS(user_id);
-create nonclustered index indx_order_status_code on ORDERS(order_status_code);
 
 -- ORDER_ITEMS
 create nonclustered index indx_order_items_order_id on ORDER_ITEMS(order_id);

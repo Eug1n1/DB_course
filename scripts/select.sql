@@ -103,38 +103,56 @@ as
 		invoice_id = @invoice_id
 go
 
+create procedure get_products
+as
+    select
+        *
+    from
+        PRODUCTS
+go
+
+create procedure get_products_by_price
+    @min_price money,
+    @max_price money
+as
+    select
+        *
+    from
+        PRODUCTS
+    where
+        product_price between @min_price and @max_price
+go
+
 create procedure get_product_types_recursive
 	@product_type_id int
 as
 begin
 	with tree (product_type_id, product_type_parent_id, product_type_description)
-	as 
+	as
 	(
-		select 
-			product_type_id, 
-			product_type_parent_id, 
+		select
+			product_type_id,
+			product_type_parent_id,
 			product_type_description
-		from 
+		from
 			PRODUCT_TYPE
-		where 
+		where
 			product_type_parent_id = @product_type_id
 		union all
-		select 
-			PRODUCT_TYPE.product_type_id, 
+		select
+			PRODUCT_TYPE.product_type_id,
 			PRODUCT_TYPE.product_type_parent_id,
 			PRODUCT_TYPE.product_type_description
-		from 
-			PRODUCT_TYPE inner join tree 
+		from
+			PRODUCT_TYPE inner join tree
 		on tree.product_type_id = PRODUCT_TYPE.product_type_parent_id
 	)
-	select 
-		product_type_id, 
-		product_type_parent_id, 
+	select
+		product_type_id,
+		product_type_parent_id,
 		product_type_description
-	from 
+	from
 		tree
 	order by product_type_parent_id
 end
 go
-
-exec get_product_types_recursive 2
