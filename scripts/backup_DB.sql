@@ -13,9 +13,15 @@ create procedure import_DB
 as
 begin
 --Restore
+    alter database alconaft
+    set offline with rollback immediate
+
     RESTORE DATABASE alconaft
-        FROM disk = @path
+        FROM disk = 'C:\DB_course\backups\alconaft_12092021122919_.bak'
 		    WITH replace
+
+    alter database alconaft
+    set online
 end
 go
 

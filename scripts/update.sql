@@ -53,16 +53,12 @@ go
 create procedure update_order
 	@order_id int,
 	@user_id int,
-	@order_status_code int,
-	@order_date_placed datetime,
 	@order_details nvarchar(max)
 as
 begin
 	update ORDERS
 	set 
 		user_id = @user_id,
-		order_status_code = @order_status_code,
-		order_date_placed = @order_date_placed,
 		order_details = @order_details
 	where 
 		order_id = @order_id

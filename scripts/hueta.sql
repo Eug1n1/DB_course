@@ -15,6 +15,10 @@ ALTER Table USERS
 ALTER COLUMN login_name
  ADD MASKED WITH (FUNCTION='DEFAULT()')
 
+ALTER Table USERS
+ALTER COLUMN phone_number
+    ADD MASKED WITH( function = 'Partial(1, "XXXXXXXXX", 3)' )
+
 EXECUTE AS USER = 'reader'
 SELECT * FROM USERS
 REVERT
@@ -54,3 +58,56 @@ EXECUTE AS USER = 'reader_unmasked'
 SELECT * FROM USERS
 WHERE login_name = 'RqENkZ8Hfi'
 REVERT
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SELECT * FROM sys.symmetric_keys WHERE name LIKE '%MS_DatabaseMasterKey%'
+go
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'strongpassword';
+go
+BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey.mk'
+    ENCRYPTION BY PASSWORD = 'strongpassword';
+go
+CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
+go
+BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft.cer'
+   WITH PRIVATE KEY (
+         FILE = 'C:\DB_course\certificate\alconaft.pvk',
+         ENCRYPTION BY PASSWORD = 'strongpassword');
+go
+
+use alconaft
+go
+
+create database encryption key
+   with algorithm = AES_256
+   encryption by server certificate alconaft_cert;
+go
+
+SELECT SERVERPROPERTY('productversion'), SERVERPROPERTY ('productlevel'), SERVERPROPERTY ('edition')
+
+alter database alconaft set encryption on
+go
+
+SELECT
+DB_NAME(database_id) AS DatabaseName
+,Encryption_State AS EncryptionState
+,key_algorithm AS Algorithm
+,key_length AS KeyLength
+FROM sys.dm_database_encryption_keys
+GO
+SELECT
+    NAME AS DatabaseName,
+    IS_ENCRYPTED AS IsEncrypted
+from sys.databases where name = 'alconaft'

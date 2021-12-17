@@ -72,11 +72,3 @@ begin
 	delete from INVOICE_STATUS_CODES where invoice_status_code = @invoice_status_code
 end
 go
-
-create procedure delete_order_status_code
-	@order_status_code int
-as
-begin
-	delete from ORDER_STATUS_CODES where order_status_code = @order_status_code
-end
-go

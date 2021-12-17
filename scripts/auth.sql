@@ -19,6 +19,7 @@ create procedure register_user
     @first_name nvarchar(50),
     @last_name nvarchar(50),
     @login_name nvarchar(50),
+    @login_password nvarchar(50),
     @email_address nvarchar(50),
     @login_name nvarchar(50),
     @ret int output

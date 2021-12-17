@@ -1,22 +1,34 @@
 use alconaft
 go
 
-create procedure get_user
+create or alter procedure get_user
 	@user_id int
 as
-	select
+begin
+
+    execute as user = 'reader';
+    select
 		user_id,
 		login_name,
 		first_name,
 		last_name,
-		email_address
+		email_address,
+        phone_number
 	from
 		USERS
 	where
-		user_id = @user_id
+		user_id = 1
+    revert
+end
 go
 
-create procedure get_product_types
+
+exec get_user 1
+go
+
+select HASHBYTES('SHA2_512', '123123')
+
+create or alter procedure get_product_types
 as
 	select
 		*
@@ -24,7 +36,7 @@ as
 		PRODUCT_TYPE
 go
 
-create procedure get_product_by_id
+create or alter procedure get_product_by_id
 	@product_id int
 as
 	select
@@ -34,7 +46,7 @@ as
 	where product_id = @product_id
 go
 
-create procedure get_product_by_name
+create or alter procedure get_product_by_name
 	@product_name nvarchar(50)
 as
 	select
@@ -42,10 +54,10 @@ as
 	from
 		PRODUCTS
 	where
-		product_name like concat('%', 'KFKbAxMGhCoBzGJiebQT', '%')
+		product_name like concat('%', @product_name, '%')
 go
 
-create procedure get_order
+create or alter procedure get_order
 	@order_id int
 as
 	select
@@ -55,7 +67,7 @@ as
 	where order_id = @order_id
 go
 
-create procedure get_user_orders
+create or alter procedure get_user_orders
 	@user_id int
 as
 	select
@@ -68,7 +80,7 @@ as
 		order_id
 go
 
-create procedure get_order_items
+create or alter procedure get_order_items
 	@order_id int
 as
 	select
@@ -81,7 +93,7 @@ as
 		order_item_id
 go
 
-create procedure get_invoice_by_order
+create or alter procedure get_invoice_by_order
 	@order_id int
 as
 	select
@@ -92,7 +104,7 @@ as
 		order_id = @order_id
 go
 
-create procedure get_invoice
+create or alter procedure get_invoice
 	@invoice_id int
 as
 	select
@@ -103,7 +115,7 @@ as
 		invoice_id = @invoice_id
 go
 
-create procedure get_products
+create or alter procedure get_products
 as
     select
         *
@@ -111,7 +123,7 @@ as
         PRODUCTS
 go
 
-create procedure get_products_by_price
+create or alter procedure get_products_by_price
     @min_price money,
     @max_price money
 as
@@ -123,7 +135,7 @@ as
         product_price between @min_price and @max_price
 go
 
-create procedure get_product_types_recursive
+create or alter procedure get_product_types_recursive
 	@product_type_id int
 as
 begin
@@ -156,3 +168,55 @@ begin
 	order by product_type_parent_id
 end
 go
+
+create or alter procedure get_done_orders
+    @user_id int
+as
+    select
+        O.order_id,
+        order_details,
+        I.invoice_id,
+        payment_date,
+        payment_amount,
+        shipment_id,
+        shipment_date
+    from
+        ORDERS O join INVOICES I on O.order_id = I.order_id
+                 join PAYMENTS P on I.invoice_id = P.invoice_id
+                 left join SHIPMENT S on I.invoice_id = S.invoice_id
+    where O.user_id = @user_id
+go
+
+create or alter procedure get_open_order
+    @user_id int
+as
+    select
+        O.order_id,
+        O.order_details,
+        OI.product_id,
+        OI.order_item_quantity
+    from
+        ORDERS O join ORDER_ITEMS OI
+        on O.order_id = OI.order_id
+        left join INVOICES I
+        on O.order_id = I.order_id
+    where
+        O.user_id = @user_id and
+        I.invoice_id is null
+go
+
+create or alter procedure get_open_shipments
+    @user_id int
+as
+    select
+        *
+    from
+        ORDERS O join INVOICES I on O.order_id = I.order_id
+        join SHIPMENT S on I.invoice_id = S.invoice_id
+    where
+        O.user_id = @user_id and
+        shipment_date is null
+go
+
+
+exec get_done_orders 1

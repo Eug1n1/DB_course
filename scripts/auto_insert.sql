@@ -1,7 +1,7 @@
 use alconaft
 go
 
-create procedure autoinsert_users
+create or alter procedure autoinsert_users
 	@limit int
 as 
 begin
@@ -46,7 +46,7 @@ end
 
 go
 
-create proc autoinsert_products
+create or alter procedure autoinsert_products
 	@limit int
 as
 begin
@@ -82,7 +82,7 @@ begin
 end
 go
 
-create procedure autoinsert_orders
+create or alter procedure autoinsert_orders
 	@limit int
 as
 begin
@@ -115,7 +115,7 @@ begin
 		order by abs(checksum(newid()))
 	)
 
-	insert into ORDERS (user_id, order_status_code, order_details) values (@user_id, @order_status_code, @order_datails)
+	insert into ORDERS (user_id, order_details) values (@user_id, @order_datails)
 	
 	print @i
 	set @i = @i + 1
@@ -123,7 +123,7 @@ begin
 end
 go
 
-create procedure autoinsert_product_type
+create or alter procedure autoinsert_product_type
 	@limit int
 as 
 begin
@@ -180,7 +180,7 @@ begin
 end
 go
 
-create procedure autoinsert_order_status_codes
+create or alter procedure autoinsert_order_status_codes
 	@limit int
 as
 begin
@@ -199,7 +199,7 @@ begin
 end
 go
 
-create procedure autoinsert_invoice_status_codes
+create or alter procedure autoinsert_invoice_status_codes
 	@limit int
 as
 begin
@@ -218,7 +218,7 @@ begin
 end
 go
 
-create procedure autoinsert_order_items
+create or alter procedure autoinsert_order_items
 as
 begin
 	declare @product_id int,
@@ -273,7 +273,7 @@ begin
 end
 go
 
-create procedure autoinsert_invoices
+create or alter procedure autoinsert_invoices
 as
 begin
 	declare @i int = 0,
@@ -314,7 +314,7 @@ begin
 end
 go
 
-create procedure autoinsert_shipment
+create or alter procedure autoinsert_shipment
 as
 begin
 	declare @invoice_id int,
@@ -348,7 +348,7 @@ begin
 end
 go
 
-create procedure autoinsert_payment
+create or alter procedure autoinsert_payment
 as
 begin
 	declare @i int = 0,
@@ -399,7 +399,7 @@ go
 exec autoinsert_users 100000
 exec autoinsert_product_type 100
 exec autoinsert_invoice_status_codes 5
-exec autoinsert_order_status_codes 5
+-- exec autoinsert_order_status_codes 5
 exec autoinsert_products 100000
 exec autoinsert_orders 2000
 exec autoinsert_order_items

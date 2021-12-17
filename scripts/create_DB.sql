@@ -1,16 +1,12 @@
-﻿create database alconaft
+﻿drop database alconaft
+go
+
+create database alconaft
 use alconaft
 
-drop table PAYMENTS
-drop table SHIPMENT
-drop table INVOICES
-drop table ORDER_ITEMS
-drop table ORDERS
-drop table INVOICE_STATUS_CODES
-drop table ORDER_STATUS_CODES
-drop table PRODUCTS
-drop table PRODUCT_TYPE
-drop table USERS
+CREATE USER reader WITHOUT LOGIN
+GRANT SELECT ON USERS TO reader
+
 
 create table USERS 
 (
@@ -20,7 +16,7 @@ create table USERS
 	email_address nvarchar(255) masked with ( function = 'Email()' ) not null unique,
 	login_name nvarchar(50) masked with ( function = 'DEFAULT()' ) not null unique,
 	login_password nvarchar(50) not null,
-	phone_number nvarchar(13),
+	phone_number nvarchar(13) masked with ( function = 'Partial(1, "XXX", 3)' ),
 	address_line_1 nvarchar(50),
 	address_line_2 nvarchar(50),
 	town_city nvarchar(50),
@@ -55,22 +51,18 @@ create table ORDER_STATUS_CODES
 	order_status_code_description nvarchar(50) unique,
 )
 
-insert into ORDER_STATUS_CODES values ('cancelled'),('completed'),('waiting')
-
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
-	user_id int constraint CUSTOMER_ID_FK foreign key references USERS(user_id) on delete cascade not null,
-	order_status_code int constraint ORDER_STATUS_CODE_FK foreign key references ORDER_STATUS_CODES(order_status_code) on delete set null,
-	order_date_placed datetime,
+	user_id int constraint CUSTOMER_ID_FK foreign key references USERS(user_id) on delete cascade,
 	order_details nvarchar(max)
 )
 
 create table ORDER_ITEMS
 (
 	order_item_id int identity(1,1) constraint ORDER_ITEM_PK primary key,
-	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id) on delete cascade not null,
-	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade not null,
+	product_id int constraint PRODUCT_ID_FK foreign key references PRODUCTS(product_id) on delete cascade,
+	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade,
 	--order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
 	order_item_quantity int check( order_item_quantity > 0 ),
 -- вопросик с прайсом нужен ли он в этой таблице
@@ -105,5 +97,5 @@ create table SHIPMENT
 	shipment_id int identity(1,1) constraint SHIPMENT_PK primary key,
 	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) on delete cascade unique not null,
 	shipment_tracking_number nvarchar(20) not null,
-	shipment_date datetime not null,
+	shipment_date datetime,
 )

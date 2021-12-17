@@ -36,13 +36,11 @@ go
 
 create procedure insert_order
 	@user_id int,
-	@order_status_code int,
-	@order_date_placed datetime,
 	@order_details nvarchar(max)
 as
 begin
-	insert into ORDERS (user_id, order_status_code, order_date_placed, order_details)
-	values (@user_id, @order_status_code, @order_date_placed, @order_details)
+	insert into ORDERS (user_id, order_details)
+	values (@user_id, @order_details)
 end
 go
 
