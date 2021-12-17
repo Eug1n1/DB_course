@@ -2,11 +2,10 @@
 go
 
 create database alconaft
+go
+
 use alconaft
-
-CREATE USER reader WITHOUT LOGIN
-GRANT SELECT ON USERS TO reader
-
+go
 
 create table USERS 
 (
@@ -99,3 +98,54 @@ create table SHIPMENT
 	shipment_tracking_number nvarchar(20) not null,
 	shipment_date datetime,
 )
+
+
+use master
+
+if not exists (SELECT * FROM sys.symmetric_keys WHERE name LIKE '%MS_DatabaseMasterKey%')
+begin
+    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'strongpassword';
+end
+go
+
+BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey1.mk'
+    ENCRYPTION BY PASSWORD = 'strongpassword';
+go
+
+CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
+go
+
+BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft1.cer'
+   WITH PRIVATE KEY (
+         FILE = 'C:\DB_course\certificate\alconaft1.pvk',
+         ENCRYPTION BY PASSWORD = 'strongpassword');
+go
+
+use alconaft
+
+create database encryption key
+   with algorithm = AES_256
+   encryption by server certificate alconaft_cert;
+go
+
+alter database alconaft set encryption on
+go
+
+select
+    DB_NAME(database_id) AS DatabaseName,
+    Encryption_State AS EncryptionState,
+    key_algorithm AS Algorithm,
+    key_length AS KeyLength
+from
+    sys.dm_database_encryption_keys
+go
+
+select
+    name AS DatabaseName,
+    is_encrypted AS IsEncrypted
+from sys.databases where name = 'alconaft'
+
+
+use alconaft
+create user reader without login
+grant select on USERS to reader

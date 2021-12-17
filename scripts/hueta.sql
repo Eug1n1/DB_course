@@ -65,31 +65,24 @@ REVERT
 
 
 
-
-
-
-
-
-
+use master
 
 SELECT * FROM sys.symmetric_keys WHERE name LIKE '%MS_DatabaseMasterKey%'
 go
 CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'strongpassword';
 go
-BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey.mk'
+BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey1.mk'
     ENCRYPTION BY PASSWORD = 'strongpassword';
 go
 CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
 go
-BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft.cer'
+BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft1.cer'
    WITH PRIVATE KEY (
-         FILE = 'C:\DB_course\certificate\alconaft.pvk',
+         FILE = 'C:\DB_course\certificate\alconaft1.pvk',
          ENCRYPTION BY PASSWORD = 'strongpassword');
 go
 
 use alconaft
-go
-
 create database encryption key
    with algorithm = AES_256
    encryption by server certificate alconaft_cert;
