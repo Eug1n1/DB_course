@@ -1,12 +1,9 @@
 use alconaft
 go
 
-alter procedure export_products
+create or alter procedure export_products
 as
 Begin
-	select * from PRODUCTS
-		for xml path('PRODUCT'), root('PRODUCTS');
-
 	exec master.dbo.sp_configure 'show advanced options', 1
 		RECONFIGURE WITH OVERRIDE
 	exec master.dbo.sp_configure 'xp_cmdshell', 1
@@ -15,15 +12,15 @@ Begin
 	declare @fileName varchar(100)
 	declare @sqlStr varchar(1000)
 	declare @sqlCmd varchar(1000)
--- `bcp "use alconaft; declare @text varchar(max) = (select * from products for xml path('PRODUCT'), ROOT('PRODUCTS')); select replace(@text, '</PRODUCT>', '</PRODUCT>' + char(13))" queryout 1.txt -w -T -S DESKTOP-FT44TPL\SQLEXPRESS
-	set @fileName = 'c:\DB_course\alconaft_products.xml'
-	set @sqlStr = 'use alconaft; declare @text varchar(max) = (select * from products for xml path(''PRODUCT''), ROOT(''PRODUCTS'')); select replace(@text, ''</PRODUCT>'', ''</PRODUCT>'' + char(13))'
+	set @fileName = 'c:\DB_course\alconaft_products_2.xml'
+	set @sqlStr = 'use alconaft; declare @text varchar(max) = (select top 100 * from products for xml path(''PRODUCT''), ' +
+	              'ROOT(''PRODUCTS'')); select replace(@text, ''</PRODUCT>'', ''</PRODUCT>'' + char(13))'
 	set @sqlCmd = 'bcp "' + @sqlStr + '" queryout ' + @fileName + ' -w -T -S DESKTOP-FT44TPL\SQLEXPRESS'
 	exec xp_cmdshell @sqlCmd;
 end
 go
 
-create procedure import_products
+create or alter procedure import_products
     @path nvarchar(100)
 as
 begin

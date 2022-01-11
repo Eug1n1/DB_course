@@ -1,6 +1,7 @@
 use alconaft
 go
 
+go
 create or alter procedure get_user
 	@user_id int
 as
@@ -17,16 +18,10 @@ begin
 	from
 		USERS
 	where
-		user_id = 1
+		user_id = @user_id
     revert
 end
 go
-
-
-exec get_user 1
-go
-
-select HASHBYTES('SHA2_512', '123123')
 
 create or alter procedure get_product_types
 as
@@ -188,13 +183,13 @@ as
 go
 
 create or alter procedure get_open_order
-    @user_id int
+    @user_id int,
+    @order_id int output
 as
     select
-        O.order_id,
-        O.order_details,
-        OI.product_id,
-        OI.order_item_quantity
+        O.order_id
+    into
+        @order_id
     from
         ORDERS O join ORDER_ITEMS OI
         on O.order_id = OI.order_id
@@ -218,5 +213,3 @@ as
         shipment_date is null
 go
 
-
-exec get_done_orders 1

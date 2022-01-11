@@ -7,14 +7,14 @@ create or alter procedure add_order_product
     @product_quantity int
 as
 begin
-    declare @order_id int
+    declare @order_id int;
+    exec get_open_order @user_id, @order_id output
 
-    if not exists (select order_id from ORDERS where user_id = @user_id and order_status_code = 0)
+    if @order_id is null
     begin
-        insert into ORDERS (user_id, order_status_code) values (@user_id, default)
+        insert into ORDERS (user_id) values (@user_id)
+        exec get_open_order @user_id, @order_id output
     end
-
-    select @order_id = order_id from ORDERS where user_id = @user_id
 
     if exists (select order_item_id from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
     begin
@@ -24,6 +24,13 @@ begin
 		    ORDER_ITEMS
 		where
 		    order_id = @order_id and product_id = @product_id
+
+		update
+		    PRODUCTS
+		set
+		    product_quantity = product_quantity - @product_quantity
+		where
+		      product_id = @product_id
 
 		update
 			ORDER_ITEMS 
@@ -55,7 +62,6 @@ begin
 
     declare @payment_amount money = (
         select
-            order_id,
             sum(p.product_price * oi.order_item_quantity) as "order_price"
         from
             ORDER_ITEMS oi join PRODUCTS p

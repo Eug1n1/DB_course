@@ -1,29 +1,31 @@
+use master
+go
+
 create procedure export_BD
 as
 begin
-    declare @path nvarchar(100) = concat('c:\DB_course\backups\alconaft_', replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''), '_.bak')
 
+    declare @path nvarchar(100) = concat('c:\DB_course\backups\alconaft_',
+        replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''), '_.bak')
     Backup database alconaft
 	    to disk = @path
 end
 go
 
-create procedure import_DB
+
+create or alter procedure import_DB
     @path nvarchar(100)
 as
 begin
---Restore
     alter database alconaft
-    set offline with rollback immediate
+    set single_user
+    with rollback immediate;
 
     RESTORE DATABASE alconaft
-        FROM disk = 'C:\DB_course\backups\alconaft_12092021122919_.bak'
-		    WITH replace
+        FROM disk = @path
+		    WITH replace;
 
     alter database alconaft
-    set online
+    set multi_user;
 end
 go
-
-use master
-exec import_DB 'C:\DB_course\backups\alconaft_12092021122919_.bak'

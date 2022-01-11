@@ -106,14 +106,14 @@ begin
 		order by abs(checksum(newid()))
 	)
 
-	set @order_status_code =
-	(
-		select top 1
-			ORDER_STATUS_CODES.order_status_code
-		from 
-			ORDER_STATUS_CODES
-		order by abs(checksum(newid()))
-	)
+	--set @order_status_code =
+	--(
+	--	select top 1
+	--		ORDER_STATUS_CODES.order_status_code
+	--	from 
+	--		ORDER_STATUS_CODES
+	--	order by abs(checksum(newid()))
+	--)
 
 	insert into ORDERS (user_id, order_details) values (@user_id, @order_datails)
 	
@@ -180,24 +180,24 @@ begin
 end
 go
 
-create or alter procedure autoinsert_order_status_codes
-	@limit int
-as
-begin
-	declare @i int = 0,
-			@status_code_description nvarchar(20),
-			@table_name nvarchar(20)
+--create or alter procedure autoinsert_order_status_codes
+--	@limit int
+--as
+--begin
+--	declare @i int = 0,
+--			@status_code_description nvarchar(20),
+--			@table_name nvarchar(20)
 
-	while @i < @limit
-	begin
+--	while @i < @limit
+--	begin
 
-		exec RandomString 20, null, @status_code_description output
-		insert into ORDER_STATUS_CODES values (@status_code_description)
+--		exec RandomString 20, null, @status_code_description output
+--		insert into ORDER_STATUS_CODES values (@status_code_description)
 
-		set @i = @i + 1
-	end
-end
-go
+--		set @i = @i + 1
+--	end
+--end
+--go
 
 create or alter procedure autoinsert_invoice_status_codes
 	@limit int

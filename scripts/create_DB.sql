@@ -1,4 +1,6 @@
-﻿drop database alconaft
+﻿use master
+
+drop database alconaft
 go
 
 create database alconaft
@@ -16,10 +18,10 @@ create table USERS
 	login_name nvarchar(50) masked with ( function = 'DEFAULT()' ) not null unique,
 	login_password nvarchar(50) not null,
 	phone_number nvarchar(13) masked with ( function = 'Partial(1, "XXX", 3)' ),
-	address_line_1 nvarchar(50),
-	address_line_2 nvarchar(50),
-	town_city nvarchar(50),
-	county nvarchar(50),
+	address_line_1 nvarchar(50) masked with ( function = 'DEFAULT()' ),
+	address_line_2 nvarchar(50) masked with ( function = 'DEFAULT()' ),
+	town_city nvarchar(50) masked with ( function = 'DEFAULT()' ),
+	county nvarchar(50) masked with ( function = 'DEFAULT()' ),
 )
 
 create table PRODUCT_TYPE
@@ -44,11 +46,11 @@ insert into PRODUCT_TYPE (product_type_description) values ('bear'),('whiskey'),
 ('absinthe'),('gin'),('tequila'),('cognac')
 
 
-create table ORDER_STATUS_CODES
-(
-	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
-	order_status_code_description nvarchar(50) unique,
-)
+--create table ORDER_STATUS_CODES
+--(
+--	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
+--	order_status_code_description nvarchar(50) unique,
+--)
 
 create table ORDERS
 (
@@ -64,7 +66,6 @@ create table ORDER_ITEMS
 	order_id int constraint ORDER_ITEMS_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade,
 	--order_item_status_code int constraint ORDER_ITEM_STATUS_CODE_FK foreign key references ORDER_ITEM_STATUS_CODES(order_item_status_code),
 	order_item_quantity int check( order_item_quantity > 0 ),
--- вопросик с прайсом нужен ли он в этой таблице
 )
 
 create table INVOICE_STATUS_CODES
@@ -78,7 +79,7 @@ insert into INVOICE_STATUS_CODES values ('issued'),('paid')
 create table INVOICES
 (
 	invoice_id int identity(1,1) constraint INVOICES_PK primary key,
-	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade unique not null,
+	order_id int constraint INVOICES_ORDER_ID_FK foreign key references ORDERS(order_id) on delete cascade,
 	invoice_status_code int constraint INVOICE_STATUS_CODE_FK foreign key references INVOICE_STATUS_CODES(invoice_status_code) on delete set null,
 	invoice_date datetime not null
 )
@@ -108,16 +109,16 @@ begin
 end
 go
 
-BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey1.mk'
+BACKUP MASTER KEY TO FILE = 'C:\DB_course\master_key_backup\masterkey2.mk'
     ENCRYPTION BY PASSWORD = 'strongpassword';
 go
 
 CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
 go
 
-BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft1.cer'
+BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:\DB_course\certificate\alconaft2.cer'
    WITH PRIVATE KEY (
-         FILE = 'C:\DB_course\certificate\alconaft1.pvk',
+         FILE = 'C:\DB_course\certificate\alconaft2.pvk',
          ENCRYPTION BY PASSWORD = 'strongpassword');
 go
 

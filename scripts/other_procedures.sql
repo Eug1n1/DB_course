@@ -1,6 +1,6 @@
-create proc add_product_type
-	@description nvarchar(30),
-	@parent_description nvarchar(30),
+create or alter procedure add_product_type
+    @description nvarchar(30),
+    @parent_description nvarchar(30),
 	@parent_id int
 as
 begin
@@ -35,7 +35,7 @@ begin
 end
 go
 
-alter procedure RandomString
+create or alter procedure RandomString
 	@length int,
 	@char_pool nvarchar(max),
 	@random_string nvarchar(max) output

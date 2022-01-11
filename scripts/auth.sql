@@ -1,27 +1,25 @@
 use alconaft
 go
 
-create procedure login_user
+create or alter procedure login_user
 	@login_name nvarchar(50),
 	@email_address nvarchar(50),
-	@login_password nvarchar(50),
-	@ret int output
+	@login_password nvarchar(50)
 as
 begin
-	select @ret=1 
+	select user_id 
        from USERS 
        where (login_name = isnull(@login_name,null) or email_address = isnull(@email_address,null) 
              and login_password = @login_password)
 end
 go
 
-create procedure register_user
+create or alter procedure register_user
     @first_name nvarchar(50),
     @last_name nvarchar(50),
     @login_name nvarchar(50),
     @login_password nvarchar(50),
     @email_address nvarchar(50),
-    @login_name nvarchar(50),
     @ret int output
 as
 begin

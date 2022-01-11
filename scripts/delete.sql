@@ -1,7 +1,7 @@
 use alconaft
 go
 
-create procedure delete_user
+create or alter procedure delete_user
 	@user_id int
 as
 begin
@@ -9,7 +9,7 @@ begin
 end
 go
 
-create procedure delete_product
+create or alter procedure delete_product
 	@product_id int
 as
 begin
@@ -17,7 +17,7 @@ begin
 end
 go
 
-create procedure delete_order
+create or alter procedure delete_order
 	@order_id int
 as
 begin
@@ -25,7 +25,7 @@ begin
 end
 go
 
-create procedure delete_order_item
+create or alter procedure delete_order_item
 	@order_item_id int
 as
 begin
@@ -33,7 +33,7 @@ begin
 end
 go
 
-create procedure delete_invoice
+create or alter procedure delete_invoice
 	@invoice_id int
 as
 begin
@@ -41,7 +41,7 @@ begin
 end
 go
 
-create procedure delete_payment
+create or alter procedure delete_payment
 	@payment_id int
 as
 begin
@@ -49,7 +49,7 @@ begin
 end
 go
 
-create procedure delete_shipment
+create or alter procedure delete_shipment
 	@shipment_id int
 as
 begin
@@ -57,7 +57,7 @@ begin
 end
 go
 
-create procedure delete_product_type
+create or alter procedure delete_product_type
 	@product_type_id int
 as
 begin
@@ -65,7 +65,7 @@ begin
 end
 go
 
-create procedure delete_invoice_status_code
+create or alter procedure delete_invoice_status_code
 	@invoice_status_code int
 as
 begin

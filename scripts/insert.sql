@@ -1,7 +1,7 @@
 use alconaft
 go
 
-create procedure insert_user
+create or alter procedure insert_user
 	@first_name nvarchar(50),
 	@last_name nvarchar(50),
 	@email_address nvarchar(255),
@@ -21,7 +21,7 @@ begin
 end
 go
 
-create procedure insert_product
+create or alter procedure insert_product
 	@product_name nvarchar(50),
 	@product_description nvarchar(max),
 	@product_type_id int,
@@ -34,7 +34,7 @@ begin
 end
 go
 
-create procedure insert_order
+create or alter procedure insert_order
 	@user_id int,
 	@order_details nvarchar(max)
 as
@@ -44,7 +44,7 @@ begin
 end
 go
 
-create procedure insert_order_item
+create or alter procedure insert_order_item
 	@order_id int,
 	@product_id int,
 	@order_item_quantity int
@@ -55,7 +55,7 @@ begin
 end
 go
 
-create procedure insert_invoice
+create or alter procedure insert_invoice
 	@order_id int,
 	@invoice_status_code int,
 	@invoice_date datetime
@@ -66,7 +66,7 @@ begin
 end
 go
 
-create procedure insert_payment
+create or alter procedure insert_payment
 	@invoice_id int,
 	@payment_date datetime,
 	@payment_amount money
@@ -77,7 +77,7 @@ begin
 end
 go
 
-create procedure insert_shipment
+create or alter procedure insert_shipment
 	@invoice_id int,
 	@shipment_tracking_number nvarchar(20),
 	@shipment_date datetime
@@ -88,7 +88,7 @@ begin
 end
 go
 
-create procedure insert_invoice_status_code
+create or alter procedure insert_invoice_status_code
 	@invoice_status_code_description nvarchar(50)
 as
 begin
@@ -97,16 +97,16 @@ begin
 end
 go
 
-create procedure insert_order_status_code
-	@order_status_code nvarchar(50)
-as
-begin
-	insert into ORDER_STATUS_CODES (order_status_code_description)
-	values (@order_status_code)
-end
+-- create or alter procedure insert_order_status_code
+-- 	@order_status_code nvarchar(50)
+-- as
+-- begin
+-- 	insert into ORDER_STATUS_CODES (order_status_code_description)
+-- 	values (@order_status_code)
+-- end
 go
 
-create procedure insert_product_type
+create or alter procedure insert_product_type
 	@product_type_parent_id int,
 	@product_type_description nvarchar(50)
 as
