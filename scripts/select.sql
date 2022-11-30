@@ -95,7 +95,7 @@ as
 		*
 	from
 		INVOICES
-	where 
+	where
 		order_id = @order_id
 go
 
@@ -176,20 +176,20 @@ as
         shipment_id,
         shipment_date
     from
-        ORDERS O join INVOICES I on O.order_id = I.order_id
-                 join PAYMENTS P on I.invoice_id = P.invoice_id
-                 left join SHIPMENT S on I.invoice_id = S.invoice_id
+        ORDERS O join INVOICES I
+            on O.order_id = I.order_id
+                 join PAYMENTS P
+                     on I.invoice_id = P.invoice_id
+                 left join SHIPMENT S
+                     on I.invoice_id = S.invoice_id
     where O.user_id = @user_id
 go
 
 create or alter procedure get_open_order
-    @user_id int,
-    @order_id int output
+    @user_id int
 as
     select
         O.order_id
-    into
-        @order_id
     from
         ORDERS O join ORDER_ITEMS OI
         on O.order_id = OI.order_id
