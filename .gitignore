@@ -1,3 +1,4 @@
 ./backups
 ./certificate
 ./master_key_backup
+**/.idea
