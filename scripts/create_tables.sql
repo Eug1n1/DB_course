@@ -41,16 +41,17 @@ insert into PRODUCT_TYPE (product_type_description) values ('bear'),('whiskey'),
 ('absinthe'),('gin'),('tequila'),('cognac')
 
 
---create table ORDER_STATUS_CODES
---(
---	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
---	order_status_code_description nvarchar(50) unique,
---)
+create table ORDER_STATUS_CODES
+(
+	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
+	order_status_code_description nvarchar(50) unique,
+)
 
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
 	user_id int constraint CUSTOMER_ID_FK foreign key references USERS(user_id) on delete cascade,
+	order_status_code int constraint ORDERS_ORDER_STATUS_CODE_ID_FK foreign key references ORDER_STATUS_CODES(order_status_code),
 	order_details nvarchar(max)
 )
 

@@ -185,7 +185,7 @@ as
     where O.user_id = @user_id
 go
 
-create or alter procedure get_open_order
+create or alter procedure get_open_orders
     @user_id int
 as
     select

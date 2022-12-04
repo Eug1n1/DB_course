@@ -1,3 +1,6 @@
+use alconaft
+go
+
 create or alter procedure add_product_type
     @description nvarchar(30),
     @parent_description nvarchar(30),

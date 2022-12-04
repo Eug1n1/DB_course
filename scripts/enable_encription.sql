@@ -6,16 +6,19 @@ begin
 end
 go
 
-BACKUP MASTER KEY TO FILE = '/DB_course/master_key_backup/masterkey.mk'
+BACKUP MASTER KEY TO FILE = 'C:/DB_course/masterkey.mk'
     ENCRYPTION BY PASSWORD = 'Pass-123';
 go
 
-CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
+if not exists (select * from sys.certificates where name = 'alconaft_cert')
+begin
+    CREATE CERTIFICATE alconaft_cert WITH SUBJECT = 'alconaft_certificate';
+end
 go
 
-BACKUP CERTIFICATE alconaft_cert TO FILE = '/DB_course/certificates/alconaft.cer'
+BACKUP CERTIFICATE alconaft_cert TO FILE = 'C:/DB_course/alconaft.cer'
    WITH PRIVATE KEY (
-         FILE = '/DB_course/certificates/alconaft.pvk',
+         FILE = 'C:/DB_course/alconaft.pvk',
          ENCRYPTION BY PASSWORD = 'Pass-123');
 go
 

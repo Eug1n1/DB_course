@@ -1,4 +1,7 @@
-create procedure update_user
+use alconaft
+go
+
+create or alter procedure update_user
 	@user_id int,
 	@first_name nvarchar(50),
 	@last_name nvarchar(50),
@@ -29,7 +32,7 @@ begin
 end
 go
 
-create procedure update_product
+create or alter procedure update_product
 	@product_id int,
 	@product_name nvarchar(50),
 	@product_description nvarchar(max),
@@ -50,7 +53,7 @@ begin
 end
 go
 
-create procedure update_order
+create or alter procedure update_order
 	@order_id int,
 	@user_id int,
 	@order_details nvarchar(max)
@@ -65,7 +68,7 @@ begin
 end
 go
 
-create procedure update_order_item
+create or alter procedure update_order_item
 	@order_item_id int,
 	@order_id int,
 	@product_id int,
@@ -82,7 +85,7 @@ begin
 end
 go
 
-create procedure update_invoice
+create or alter procedure update_invoice
 	@invoice_id int,
 	@order_id int,
 	@invoice_status_code int,
@@ -99,7 +102,7 @@ begin
 end
 go
 
-create procedure update_payment
+create or alter procedure update_payment
 	@payment_id int,
 	@invoice_id int,
 	@payment_date datetime,
@@ -116,7 +119,7 @@ begin
 end
 go
 
-create procedure update_shipment
+create or alter procedure update_shipment
 	@shipment_id int,
 	@invoice_id int,
 	@shipment_tracking_number nvarchar(20),
@@ -133,7 +136,7 @@ begin
 end
 go
 
-create procedure update_invoice_status_code
+create or alter procedure update_invoice_status_code
 	@invoice_status_code int,
 	@invoice_status_code_description nvarchar(50)
 as
@@ -146,20 +149,20 @@ begin
 end
 go
 
-create procedure update_order_status_code
+create or alter procedure update_order_status_code
 	@order_status_code int,
-	@order_status_code nvarchar(50)
+	@order_status_code_description nvarchar(50)
 as
 begin
 	update ORDER_STATUS_CODES
 	set 
-		order_status_code = @order_status_code
+		order_status_code_description = @order_status_code_description
 	where
 		order_status_code = @order_status_code
 end
 go
 
-create procedure update_product_type
+create or alter procedure update_product_type
 	@product_type_id int,
 	@product_type_parent_id int,
 	@product_type_description nvarchar(50)

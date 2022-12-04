@@ -1,19 +1,21 @@
 use master
 go
 
-create procedure export_BD
+create or alter procedure export_BD
+    @dir_path nvarchar(100)
 as
 begin
 
-    declare @path nvarchar(100) = concat('c:\DB_course\backups\alconaft_',
-        replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''), '_.bak')
+    declare @path nvarchar(100) = concat(@dir_path, '/alconaft_')
+    set @path = concat(@path, replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''))
+    set @path = concat(@path, '_.bak')
+
     Backup database alconaft
 	    to disk = @path
 end
 go
 
-
-create or alter procedure import_DB
+create or alter procedure restore_DB
     @path nvarchar(100)
 as
 begin
