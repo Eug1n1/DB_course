@@ -21,7 +21,7 @@ create nonclustered index indx_user_id on ORDERS(user_id);
 
 -- ORDER_ITEMS
 create nonclustered index indx_order_items_order_id on ORDER_ITEMS(order_id);
-create unique nonclustered index indx_order_products on ORDER_ITEMS(order_id, product_id)
+-- create unique nonclustered index indx_order_products on ORDER_ITEMS(order_id)
 
 -- INVOICES
 create nonclustered index indx_invoices_order_id on INVOICES(order_id);
