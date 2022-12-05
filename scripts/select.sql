@@ -41,6 +41,50 @@ as
 	where product_id = @product_id
 go
 
+create or alter procedure get_products
+    @top int
+as
+    begin
+        if @top = -1
+            begin
+                select
+                    *
+                from
+                    PRODUCTS
+            end
+        else
+            begin
+                select top(@top)
+                    *
+                from
+                    PRODUCTS
+            end
+    end
+go
+
+create or alter procedure get_products_by_type
+    @type_id int,
+    @top int
+as
+    begin
+        if @top = -1
+            begin
+                select
+                    *
+                from
+                    PRODUCTS
+                where product_type_id = @type_id
+            end
+        else
+            begin
+                select top(@top)
+                    *
+                from
+                    PRODUCTS
+                where product_type_id = @type_id
+            end
+    end
+
 create or alter procedure get_product_by_name
 	@product_name nvarchar(50)
 as
@@ -185,13 +229,14 @@ as
     where O.user_id = @user_id
 go
 
-create or alter procedure get_open_orders
-    @user_id int
+create or alter procedure get_open_order
+    @user_id int,
+    @order_id int output
 as
-    select
-        O.order_id
+    select top 1
+        @order_id = O.order_id
     from
-        ORDERS O join ORDER_ITEMS OI
+        ORDERS O left join ORDER_ITEMS OI
         on O.order_id = OI.order_id
         left join INVOICES I
         on O.order_id = I.order_id
