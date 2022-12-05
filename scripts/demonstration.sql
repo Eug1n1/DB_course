@@ -5,6 +5,8 @@
 --     @login_password nvarchar(50),
 --     @email_address nvarchar(50),
 --     @ret int output
+use alconaft
+go
 
 declare @ret int
 exec register_user 
@@ -13,7 +15,7 @@ exec register_user
     'demouser', 
     '1234567890987654321', 
     'demo_email@email.com', 
-    @ret
+    @ret output
 
 select @ret
 
@@ -33,11 +35,48 @@ exec login_user
     null,
     'demouser'
 
--- product by id
+
+-- get all products
+-- create or alter procedure get_products
+--     @top int
+exec get_products -1
+
+-- get top 100 products
+-- create or alter procedure get_products
+--     @top int
+exec get_products 100
+
+-- get products by type
+-- create or alter procedure get_products_by_type
+--     @type_id int,
+--     @top int
+exec get_products_by_type 1, 100
+
+--get product by id
 -- create or alter procedure get_product_by_id
 -- 	@product_id int
-
 exec get_product_by_id 1
 
+-- add product to order
+select
+    U.user_id
+from
+    USERS U left join ORDERS O
+        on U.user_id = O.user_id
+where
+    O.order_id is null
 
--- product by name
+exec add_order_product 2, 3, 3
+
+select
+    O.user_id,
+    O.order_id,
+    OI.product_id,
+    OI.order_item_quantity
+from
+    ORDERS O left join ORDER_ITEMS OI
+        on O.order_id = OI.order_id
+where
+    user_id = 2
+
+delete ORDERS where user_id = 2
