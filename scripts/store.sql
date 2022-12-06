@@ -127,3 +127,46 @@ begin
     update SHIPMENT set shipment_date = getdate() where shipment_id = @shipment_id
 end
 go
+
+create or alter procedure drop_product_from_order
+    @user_id int,
+    @product_id int,
+    @product_quantity int
+as
+begin
+    declare @order_id int
+    exec get_open_order @user_id, @order_id output
+
+    if not exists (select * from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
+    begin
+        RAISERROR (15600, 16, -1, 'no_order_item_found');
+    end
+
+    declare @order_item_quantity int
+
+    select
+        @order_item_quantity = order_item_quantity
+    from ORDER_ITEMS
+    where order_id = @order_id
+
+    if (@order_item_quantity = @product_quantity)
+        begin
+            delete ORDER_ITEMS
+            where order_id = @order_id and product_id = @product_id
+
+            update PRODUCTS
+            set product_quantity = product_quantity + @order_item_quantity
+            where product_id = @product_id
+        end
+    else
+        begin
+            update ORDER_ITEMS
+            set order_item_quantity = order_item_quantity - @product_quantity
+            where order_id = @order_id and product_id = @product_id
+
+            update PRODUCTS
+            set product_quantity = product_quantity + @product_quantity
+            where product_id = @product_id
+        end
+end
+go
