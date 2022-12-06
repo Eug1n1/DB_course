@@ -259,3 +259,14 @@ as
         shipment_date is null
 go
 
+create or alter procedure get_order_status
+    @order_id int
+as
+    select
+        order_status
+    from
+        ORDERS
+    where
+        order_id = @order_id
+go
+

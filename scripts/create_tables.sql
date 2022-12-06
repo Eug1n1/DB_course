@@ -41,17 +41,18 @@ insert into PRODUCT_TYPE (product_type_description) values ('bear'),('whiskey'),
 ('absinthe'),('gin'),('tequila'),('cognac')
 
 
-create table ORDER_STATUS_CODES
-(
-	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
-	order_status_code_description nvarchar(50) unique,
-)
+-- create table ORDER_STATUS_CODES
+-- (
+-- 	order_status_code int identity(1,1) constraint ORDER_STATUS_CODES_PK primary key,
+-- 	order_status_code_description nvarchar(50) unique,
+-- )
 
 create table ORDERS
 (
 	order_id int identity(1,1) constraint ORDER_PK primary key,
 	user_id int constraint CUSTOMER_ID_FK foreign key references USERS(user_id) on delete cascade,
-	order_status_code int constraint ORDERS_ORDER_STATUS_CODE_ID_FK foreign key references ORDER_STATUS_CODES(order_status_code),
+-- 	order_status_code int constraint ORDERS_ORDER_STATUS_CODE_ID_FK foreign key references ORDER_STATUS_CODES(order_status_code),
+	order_status varchar(200) default 'OK',
 	order_details nvarchar(max)
 )
 
@@ -85,7 +86,7 @@ create table PAYMENTS
 	payment_id int identity(1,1) constraint PAYMENTS_PK primary key,
 	invoice_id int constraint INVOICE_ID_FK foreign key references INVOICES(invoice_id) on delete cascade unique not null,
 	payment_date datetime not null,
-	payment_amount money,
+	payment_amount money constraint CHK_payment_amount check (payment_amount > 0),
 )
 
 create table SHIPMENT
@@ -93,5 +94,5 @@ create table SHIPMENT
 	shipment_id int identity(1,1) constraint SHIPMENT_PK primary key,
 	invoice_id int constraint SHIPMENT_INVOICE_ID_FK references INVOICES(invoice_id) on delete cascade unique not null,
 	shipment_tracking_number nvarchar(20) not null,
-	shipment_date datetime,
+	shipment_date datetime not null ,
 )

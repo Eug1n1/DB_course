@@ -176,3 +176,14 @@ begin
 		product_type_id = @product_type_id
 end
 go
+
+create or alter procedure update_order_status
+    @order_id int,
+    @order_status varchar(200)
+as
+begin
+    update ORDERS
+    set order_status = @order_status
+    where order_id = @order_id
+end
+go
