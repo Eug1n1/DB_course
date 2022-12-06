@@ -59,19 +59,24 @@ exec get_product_by_id 1
 
 -- add product to order
 
-exec add_product_to_order 2, 34,1
+exec add_product_to_order 2, 4, 1
 
--- check user orders
-select
-    O.user_id,
-    O.order_id,
-    OI.product_id,
-    OI.order_item_quantity
-from
-    ORDERS O left join ORDER_ITEMS OI
-        on O.order_id = OI.order_id
-where
-    user_id = 2
+-- delete product from order
 
--- delete user orders
-delete ORDERS where user_id = 2
+exec drop_product_from_order 2, 4, 1
+
+    -- check user orders
+    select
+        O.user_id,
+        O.order_id,
+        OI.product_id,
+        OI.order_item_quantity
+    from
+        ORDERS O left join ORDER_ITEMS OI
+            on O.order_id = OI.order_id
+    where
+        user_id = 2
+
+    -- delete user orders
+    delete ORDERS where user_id = 2
+
