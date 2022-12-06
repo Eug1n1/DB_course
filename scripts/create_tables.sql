@@ -33,7 +33,7 @@ create table PRODUCTS
 	product_description nvarchar(max),
 	product_type_id int constraint PRODUCT_TYPE_FK foreign key references PRODUCT_TYPE(product_type_id) on delete set null,
 	product_price money not null,
-	product_quantity int not null
+	product_quantity int check( product_quantity > 0 )
 )
 
 insert into PRODUCT_TYPE (product_type_description) values ('bear'),('whiskey'),
