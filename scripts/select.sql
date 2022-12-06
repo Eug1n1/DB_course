@@ -84,6 +84,7 @@ as
                 where product_type_id = @type_id
             end
     end
+go
 
 create or alter procedure get_product_by_name
 	@product_name nvarchar(50)
