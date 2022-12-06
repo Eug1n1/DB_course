@@ -58,16 +58,10 @@ exec get_products_by_type 1, 100
 exec get_product_by_id 1
 
 -- add product to order
-select
-    U.user_id
-from
-    USERS U left join ORDERS O
-        on U.user_id = O.user_id
-where
-    O.order_id is null
 
-exec add_order_product 2, 3, 3
+exec add_product_to_order 2, 34,1
 
+-- check user orders
 select
     O.user_id,
     O.order_id,
@@ -79,4 +73,5 @@ from
 where
     user_id = 2
 
+-- delete user orders
 delete ORDERS where user_id = 2
