@@ -1,0 +1,12 @@
+1. ./scripts/create_tables.sql
+2. ./scripts/indexes.sql
+3. ./scripts/delete.sql
+4. ./scripts/update.sql
+5. ./scripts/insert.sql
+6. ./scripts/other_procedures.sql
+7. ./scripts/store.sql
+8. ./scripts/auth.sql
+9. ./scripts/auto_insert.sql
+10. ./scripts/enable_encription.sql
+11. ./scripts/export_import.sql
+12. ./scripts/backup_DB.sql
