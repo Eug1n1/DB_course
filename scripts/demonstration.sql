@@ -24,16 +24,39 @@ select @ret
 -- 	@login_name nvarchar(50),
 -- 	@email_address nvarchar(50), 
 -- 	@login_password nvarchar(50)
+declare @user_id int
 
 exec login_user
     'demouser',
     'demo_email@email.com',
-    null
+    '1234567890987654321',
+    @user_id output
+select @user_id
 
+declare @user_id int
 exec login_user
     'demouser',
     null,
-    'demouser'
+    '1234567890987654321',
+    @user_id output
+select @user_id
+
+declare @user_id int
+exec login_user
+    null,
+    null,
+    '1234567890987654321',
+    @user_id output
+select @user_id
+
+declare @user_id int
+exec login_user
+    null,
+    'demo_email@email.com',
+    '1234567890987654321',
+    @user_id output
+select @user_id
+
 
 
 -- get all products
@@ -59,13 +82,23 @@ exec get_product_by_id 1
 
 -- add product to order
 
+-- create or alter procedure add_product_to_order
+--     @user_id int,
+--     @product_id int,
+--     @product_quantity int
+
 exec add_product_to_order 2, 4, 1
 
 -- delete product from order
 
+-- create or alter procedure drop_product_from_order
+--     @user_id int,
+--     @product_id int,
+--     @product_quantity int
+
 exec drop_product_from_order 2, 4, 1
 
-    -- check user orders
+    -- check user opened orders
     select
         O.user_id,
         O.order_id,
@@ -79,4 +112,42 @@ exec drop_product_from_order 2, 4, 1
 
     -- delete user orders
     delete ORDERS where user_id = 2
+
+
+-- buy order
+
+exec buy_order 2003
+
+    -- check user closed orders
+    select
+        O.user_id,
+        O.order_id,
+        I.invoice_id,
+        P.payment_date,
+        P.payment_amount
+    from
+        ORDERS O inner join INVOICES I
+            on O.order_id = I.order_id
+        inner join PAYMENTS P
+            on I.invoice_id = P.invoice_id
+    where
+        user_id = 2
+
+-- get opened orders
+declare @opened_order_id int
+exec get_open_order 2, @opened_order_id output
+select  @opened_order_id
+
+exec get_done_orders 2
+
+
+-- get order status
+
+exec get_order_status 2001
+
+
+-- get history as closed orders
+
+exec get_done_orders 2
+
 
