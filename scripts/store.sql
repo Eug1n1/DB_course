@@ -7,52 +7,74 @@ create or alter procedure add_product_to_order
     @product_quantity_order int
 as
 begin
-    declare @order_id int;
-    exec get_open_order @user_id, @order_id output
-
-    if @order_id is null
-    begin
-        insert into ORDERS (user_id) values (@user_id)
+    begin try
+        declare @order_id int;
         exec get_open_order @user_id, @order_id output
-    end
 
-    if exists (select order_item_id from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
-    begin
+        if @order_id is null
+        begin
+            insert into ORDERS (user_id) values (@user_id)
+            exec get_open_order @user_id, @order_id output
+        end
+
         declare @product_quantity_product int
 
         select @product_quantity_product = product_quantity from PRODUCTS where product_id = @product_id
 
-		if (@product_quantity_product < @product_quantity_order)
+        if (@product_quantity_product < @product_quantity_order)
         begin
-            rollback transaction
+            RAISERROR (15600, 16, -1, 'mysp_CreateCustomer');
         end
 
         update
-		    PRODUCTS
-		set
-		    product_quantity = product_quantity - @product_quantity_order
-		where
-		      product_id = @product_id
+            PRODUCTS
+        set
+            product_quantity = product_quantity - @product_quantity_order
+        where
+              product_id = @product_id
 
-		select
-		    @product_quantity_order = @product_quantity_order + order_item_quantity
-		from
-		    ORDER_ITEMS
-		where
-		    order_id = @order_id and product_id = @product_id
+        if exists (select order_item_id from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
+        begin
 
-		update
-			ORDER_ITEMS 
-		set
-			order_item_quantity = @product_quantity_order
-		where
-			order_id = @order_id and product_id = @product_id
-    end
-    else
-        exec insert_order_item
-            @order_id,
-            @product_id,
-            @product_quantity_order
+            select
+                @product_quantity_order = @product_quantity_order + order_item_quantity
+            from
+                ORDER_ITEMS
+            where
+                order_id = @order_id and product_id = @product_id
+
+            update
+                ORDER_ITEMS
+            set
+                order_item_quantity = @product_quantity_order
+            where
+                order_id = @order_id and product_id = @product_id
+        end
+        else
+            begin
+                exec insert_order_item
+                @order_id,
+                @product_id,
+                @product_quantity_order
+            end
+    end try
+    begin catch
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        -- Use RAISERROR inside the CATCH block to return error
+        -- information about the original error that caused
+        -- execution to jump to the CATCH block.
+        RAISERROR (@ErrorMessage, -- Message text.
+                   @ErrorSeverity, -- Severity.
+                   @ErrorState);
+    end catch
 end
 go
 
