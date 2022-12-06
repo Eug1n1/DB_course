@@ -17,6 +17,11 @@ begin
             exec get_open_order @user_id, @order_id output
         end
 
+        if exists(select * from INVOICES where order_id = @order_id)
+        begin
+            RAISERROR (15600, 16, -1, 'order_already_closed');
+        end
+
         declare @product_quantity_product int
 
         select @product_quantity_product = product_quantity from PRODUCTS where product_id = @product_id
@@ -82,30 +87,51 @@ create or alter procedure buy_order
     @order_id int
 as
 begin
-    if exists (select * from INVOICES where order_id = @order_id)
-    begin
-        select -1
-    end
+    begin try
+        if exists (select * from INVOICES where order_id = @order_id)
+        begin
+            RAISERROR (15600, 16, -1, 'order_already_closed');
+        end
 
-    insert into INVOICES (order_id, invoice_status_code, invoice_date) values (@order_id, 0, getdate())
+        insert into INVOICES (order_id, invoice_status_code, invoice_date) values (@order_id, 1, getdate())
 
-    declare @invoice_id int = (select invoice_id from INVOICES where order_id = @order_id)
+        declare @invoice_id int
+        select @invoice_id = invoice_id from INVOICES where order_id = @order_id
 
-    declare @payment_amount money = (
-        select
-            sum(p.product_price * oi.order_item_quantity) as "order_price"
-        from
-            ORDER_ITEMS oi join PRODUCTS p
-            on oi.product_id = p.product_id
-        where
-            oi.order_id = @order_id
-        group by
-            order_id
-    )
+        declare @payment_amount money = (
+            select
+                sum(p.product_price * oi.order_item_quantity) as "order_price"
+            from
+                ORDER_ITEMS oi join PRODUCTS p
+                on oi.product_id = p.product_id
+            where
+                oi.order_id = @order_id
+            group by
+                order_id
+        )
 
-    insert into PAYMENTS (invoice_id, payment_date, payment_amount) values (@invoice_id, getdate(), @payment_amount)
+        if (@payment_amount is null)
+        begin
+            RAISERROR (15600, 16, -1, 'order_empty');
+        end
 
-    select 1
+        insert into PAYMENTS (invoice_id, payment_date, payment_amount) values (@invoice_id, getdate(), @payment_amount)
+
+    end try
+    begin catch
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, -- Message text.
+                   @ErrorSeverity, -- Severity.
+                   @ErrorState);
+    end catch
 end
 go
 
@@ -134,39 +160,69 @@ create or alter procedure drop_product_from_order
     @product_quantity int
 as
 begin
-    declare @order_id int
-    exec get_open_order @user_id, @order_id output
 
-    if not exists (select * from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
-    begin
-        RAISERROR (15600, 16, -1, 'no_order_item_found');
-    end
+    begin try
 
-    declare @order_item_quantity int
+        declare @order_id int
 
-    select
-        @order_item_quantity = order_item_quantity
-    from ORDER_ITEMS
-    where order_id = @order_id
+        exec get_open_order @user_id, @order_id output
 
-    if (@order_item_quantity = @product_quantity)
+        if exists(select * from INVOICES where order_id = @order_id)
         begin
-            delete ORDER_ITEMS
-            where order_id = @order_id and product_id = @product_id
-
-            update PRODUCTS
-            set product_quantity = product_quantity + @order_item_quantity
-            where product_id = @product_id
+            RAISERROR (15600, 16, -1, 'order_already_closed');
         end
-    else
+
+        if not exists (select * from ORDER_ITEMS where order_id = @order_id and product_id = @product_id)
         begin
-            update ORDER_ITEMS
-            set order_item_quantity = order_item_quantity - @product_quantity
-            where order_id = @order_id and product_id = @product_id
-
-            update PRODUCTS
-            set product_quantity = product_quantity + @product_quantity
-            where product_id = @product_id
+            RAISERROR (15600, 16, -1, 'no_order_item_found');
         end
+
+        declare @order_item_quantity int
+
+        select
+            @order_item_quantity = order_item_quantity
+        from ORDER_ITEMS
+        where order_id = @order_id
+
+        if (@order_item_quantity = @product_quantity)
+            begin
+                delete ORDER_ITEMS
+                where order_id = @order_id and product_id = @product_id
+
+                if not exists(select * from ORDER_ITEMS where order_id = @order_id)
+                begin
+                    delete ORDERS where order_id = @order_id
+                end
+
+                update PRODUCTS
+                set product_quantity = product_quantity + @order_item_quantity
+                where product_id = @product_id
+            end
+        else
+            begin
+                update ORDER_ITEMS
+                set order_item_quantity = order_item_quantity - @product_quantity
+                where order_id = @order_id and product_id = @product_id
+
+                update PRODUCTS
+                set product_quantity = product_quantity + @product_quantity
+                where product_id = @product_id
+            end
+
+    end try
+    begin catch
+        DECLARE @ErrorMessage NVARCHAR(4000);
+        DECLARE @ErrorSeverity INT;
+        DECLARE @ErrorState INT;
+
+        SELECT
+            @ErrorMessage = ERROR_MESSAGE(),
+            @ErrorSeverity = ERROR_SEVERITY(),
+            @ErrorState = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, -- Message text.
+                   @ErrorSeverity, -- Severity.
+                   @ErrorState);
+    end catch
 end
 go
