@@ -143,8 +143,8 @@ exec get_done_orders 2
 
 -- get order status
 
-exec get_order_status 2001
-
+exec get_order_status 2000
+exec update_order_status 2000, 'ok'
 
 -- get history as closed orders
 
