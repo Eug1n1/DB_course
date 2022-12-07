@@ -1,14 +1,19 @@
 use master
 go
 
-create or alter procedure export_BD
-    @dir_path nvarchar(100)
+create or alter procedure create_backup
+    @dir_path nvarchar(200),
+    @file_name nvarchar(100)
 as
 begin
+    declare @path nvarchar(200) = @dir_path + '/' +  isnull(@file_name, '')
 
-    declare @path nvarchar(100) = concat(@dir_path, '/alconaft_')
-    set @path = concat(@path, replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''))
-    set @path = concat(@path, '_.bak')
+    if @file_name is null
+    begin
+        set @path = concat(@dir_path, '/alconaft_')
+        set @path = concat(@path, replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':',''))
+        set @path = concat(@path, '_.bak')
+    end
 
     Backup database alconaft
 	    to disk = @path
