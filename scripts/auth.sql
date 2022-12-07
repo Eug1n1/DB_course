@@ -54,7 +54,7 @@ begin
     begin try
         set @ret = 0
 
-        select @ret=user_id from USERS where email_address = @email_address
+        select @ret = user_id from USERS where email_address = @email_address
         if (@ret != 0)
         begin
             RAISERROR (15600, 16, -1, 'user_already_exist')
